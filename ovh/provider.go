@@ -11,43 +11,39 @@ import (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"email": &schema.Schema{
+			"endpoint": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("DNSIMPLE_EMAIL", nil),
-				Description: "The DNSimple account email address.",
+				DefaultFunc: schema.EnvDefaultFunc("OVH_ENDPOINT", nil),
+				Description: "the OVH endpoint, should be ovh-eu or ovh-us",
 			},
-
-			"token": &schema.Schema{
+			"application_key": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("DNSIMPLE_TOKEN", nil),
-				Description: "The API v2 token for API operations.",
+				DefaultFunc: schema.EnvDefaultFunc("OVH_APPLICATION_KEY", nil),
+				Description: "Application Key",
 			},
-
-			"account": &schema.Schema{
+			"application_secret": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("DNSIMPLE_ACCOUNT", nil),
-				Description: "The account for API operations.",
+				DefaultFunc: schema.EnvDefaultFunc("OVH_APPLICATION_SECRET", nil),
+				Description: "Application secret key.",
+			},
+			"consumer_key": &schema.Schema{
+				Type:        schema.TypeString,
+				Required:    true,
+				DefaultFunc: schema.EnvDefaultFunc("OVH_CONSUMER_KEY", nil),
+				Description: "Consumer Key.",
 			},
 		},
-
 		ResourcesMap: map[string]*schema.Resource{
-			"dnsimple_record": resourceDNSimpleRecord(),
+			"ovh_dns_record": resourceDNSimpleRecord(),
 		},
-
 		ConfigureFunc: providerConfigure,
 	}
 }
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
-	// DNSimple API v1 requires email+token to authenticate.
-	// DNSimple API v2 requires only an OAuth token and in this particular case
-	// the reference of the account for API operations (to avoid fetching it in real time).
-	//
-	// v2 is not backward compatible with v1, therefore return an error in case email is set,
-	// to inform the user to upgrade to v2. Also, v1 token is not the same of v2.
 	if email := d.Get("email").(string); email != "" {
 		return nil, errors.New(
 			"DNSimple API v2 requires an account identifier and the new OAuth token. " +

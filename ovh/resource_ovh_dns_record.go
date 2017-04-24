@@ -8,87 +8,81 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
-func resourceDNSimpleRecord() *schema.Resource {
+type Record struct {
+	Id int `json:"id"`
+	Zone string `json:"zone"`
+    Target string `json:"target"`
+	Ttl int `json:"ttl"`
+    FieldType string `json:"fieldType"`
+    SubDomain string `json:"subDomain"`
+}
+
+func resourceOVHDomainZoneRecord() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceDNSimpleRecordCreate,
-		Read:   resourceDNSimpleRecordRead,
-		Update: resourceDNSimpleRecordUpdate,
-		Delete: resourceDNSimpleRecordDelete,
+		Create: resourceOVHRecordCreate,
+		Read:   resourceOVHRecordRead,
+		Update: resourceOVHRecordUpdate,
+		Delete: resourceOVHRecordDelete,
 
 		Schema: map[string]*schema.Schema{
-			"domain": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-
-			"domain_id": {
+			"id": {
 				Type:     schema.TypeString,
 				Computed: true,
-			},
-
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-
-			"hostname": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-
-			"type": {
-				Type:     schema.TypeString,
-				Required: true,
 				ForceNew: true,
 			},
-
-			"value": {
+            "zone": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-
+			"target": {
+				Type:     schema.TypeString,
+				Required: true,
+			},
 			"ttl": {
 				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "3600",
+				Required: true,
+                Default: "3600",
 			},
-
-			"priority": {
+			"fieldType": {
 				Type:     schema.TypeString,
-				Computed: true,
+				Required: true,
 			},
-		},
+            "subDomain": {
+				Type:     schema.TypeString,
+				Required: false,
+			},
+        },
 	}
 }
 
-func resourceDNSimpleRecordCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceOVHRecordCreate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*Client)
-
+    
 	// Create the new record
-	newRecord := dnsimple.ZoneRecord{
-		Name:    d.Get("name").(string),
-		Type:    d.Get("type").(string),
-		Content: d.Get("value").(string),
+    newRecord := &Record{
+		Zone:       d.Get("zone").(string),
+		FieldType:  d.Get("fieldType").(string),
+		SubDomain:  d.Get("subDomain").(string),
+        Target:     d.Get("Target").(string),
+        Ttl:        strconv.Atoi(attr.(string),
 	}
-	if attr, ok := d.GetOk("ttl"); ok {
-		newRecord.TTL, _ = strconv.Atoi(attr.(string))
-	}
-
-	log.Printf("[DEBUG] DNSimple Record create configuration: %#v", newRecord)
-
-	resp, err := provider.client.Zones.CreateRecord(provider.config.Account, d.Get("domain").(string), newRecord)
+	
+	log.Printf("[DEBUG] OVH Record create configuration: %#v", newRecord)
+    
+    resultID := int;
+	resp, err := provider.client.Post(fmt.Sprintf("/domain/zone/%s/record", newRecord.Zone), newRecord, &resultID)
 	if err != nil {
-		return fmt.Errorf("Failed to create DNSimple Record: %s", err)
+		return fmt.Errorf("Failed to create OVH Record: %s", err)
 	}
 
-	d.SetId(strconv.Itoa(resp.Data.ID))
-	log.Printf("[INFO] DNSimple Record ID: %s", d.Id())
+	d.SetId(strconv.Itoa(resultID))
+	d.set("id", strconv.Itoa(resultID))
+    log.Printf("[INFO] OVH Record ID: %s", d.Id())
 
-	return resourceDNSimpleRecordRead(d, meta)
+	return resourceOVHRecordRead(d, meta)
 }
 
-func resourceDNSimpleRecordRead(d *schema.ResourceData, meta interface{}) error {
+func resourceOVHRecordRead(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*Client)
 
 	recordID, err := strconv.Atoi(d.Id())
@@ -96,29 +90,23 @@ func resourceDNSimpleRecordRead(d *schema.ResourceData, meta interface{}) error 
 		return fmt.Errorf("Error converting Record ID: %s", err)
 	}
 
-	resp, err := provider.client.Zones.GetRecord(provider.config.Account, d.Get("domain").(string), recordID)
+    record := Record{}
+	resp, err := provider.client.Get(fmt.Sprintf("/domain/zone/%s/record/%s", d.Get("zone").(string), recordID), &record)
 	if err != nil {
-		return fmt.Errorf("Couldn't find DNSimple Record: %s", err)
+		return fmt.Errorf("Couldn't find OVH Record: %s", err)
 	}
 
-	record := resp.Data
-	d.Set("domain_id", record.ZoneID)
-	d.Set("name", record.Name)
-	d.Set("type", record.Type)
-	d.Set("value", record.Content)
-	d.Set("ttl", strconv.Itoa(record.TTL))
-	d.Set("priority", strconv.Itoa(record.Priority))
-
-	if record.Name == "" {
-		d.Set("hostname", d.Get("domain").(string))
-	} else {
-		d.Set("hostname", fmt.Sprintf("%s.%s", record.Name, d.Get("domain").(string)))
-	}
+	d.Set("id", record.Id)
+	d.Set("zone", record.Zone)
+	d.Set("fieldType", record.FieldType)
+	d.Set("subDomain", record.SubDomain)
+	d.Set("ttl", strconv.Itoa(record.Ttl))
+	d.Set("target", strconv.Itoa(record.Target))
 
 	return nil
 }
 
-func resourceDNSimpleRecordUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceOVHRecordUpdate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*Client)
 
 	recordID, err := strconv.Atoi(d.Id())
@@ -126,26 +114,30 @@ func resourceDNSimpleRecordUpdate(d *schema.ResourceData, meta interface{}) erro
 		return fmt.Errorf("Error converting Record ID: %s", err)
 	}
 
-	updateRecord := dnsimple.ZoneRecord{}
+    record := Record{}
 
-	if attr, ok := d.GetOk("name"); ok {
-		updateRecord.Name = attr.(string)
+	if attr, ok := d.GetOk("subDomain"); ok {
+		record.SubDomain = attr.(string)
 	}
-	if attr, ok := d.GetOk("type"); ok {
-		updateRecord.Type = attr.(string)
+	if attr, ok := d.GetOk("fieldType"); ok {
+		record.FieldType = attr.(string)
 	}
-	if attr, ok := d.GetOk("value"); ok {
-		updateRecord.Content = attr.(string)
+	if attr, ok := d.GetOk("target"); ok {
+		record.Target = attr.(string)
 	}
 	if attr, ok := d.GetOk("ttl"); ok {
-		updateRecord.TTL, _ = strconv.Atoi(attr.(string))
+		record.Ttl, _ = strconv.Atoi(attr.(string))
 	}
 
-	log.Printf("[DEBUG] DNSimple Record update configuration: %#v", updateRecord)
+	log.Printf("[DEBUG] OVH Record update configuration: %#v", updateRecord)
 
-	_, err = provider.client.Zones.UpdateRecord(provider.config.Account, d.Get("domain").(string), recordID, updateRecord)
+	_, err = provider.client.Put(
+        fmt.Sprintf("/domain/zone/%s/record/%s", d.Get("zone").(string), recordID), 
+        record,
+        nil
+    )
 	if err != nil {
-		return fmt.Errorf("Failed to update DNSimple Record: %s", err)
+		return fmt.Errorf("Failed to update OVH Record: %s", err)
 	}
 
 	return resourceDNSimpleRecordRead(d, meta)
@@ -154,16 +146,20 @@ func resourceDNSimpleRecordUpdate(d *schema.ResourceData, meta interface{}) erro
 func resourceDNSimpleRecordDelete(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*Client)
 
-	log.Printf("[INFO] Deleting DNSimple Record: %s, %s", d.Get("domain").(string), d.Id())
+	log.Printf("[INFO] Deleting OVH Record: %s.%s, %s", d.Get("zone").(string), d.Get("subDomain").(string), d.Id())
 
 	recordID, err := strconv.Atoi(d.Id())
 	if err != nil {
 		return fmt.Errorf("Error converting Record ID: %s", err)
 	}
 
-	_, err = provider.client.Zones.DeleteRecord(provider.config.Account, d.Get("domain").(string), recordID)
+	_, err = provider.client.Delete(
+        fmt.Sprintf("/domain/zone/%s/record/%s", d.Get("zone").(string), recordID), 
+        nil
+    )
+
 	if err != nil {
-		return fmt.Errorf("Error deleting DNSimple Record: %s", err)
+		return fmt.Errorf("Error deleting OVH Record: %s", err)
 	}
 
 	return nil

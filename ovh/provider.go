@@ -37,22 +37,18 @@ func Provider() terraform.ResourceProvider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"ovh_dns_record": resourceDNSimpleRecord(),
+			"ovh_domain_zone_record": resourceOVHDomainZoneRecord(),
 		},
 		ConfigureFunc: providerConfigure,
 	}
 }
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
-	if email := d.Get("email").(string); email != "" {
-		return nil, errors.New(
-			"DNSimple API v2 requires an account identifier and the new OAuth token. " +
-				"Please upgrade your configuration.")
-	}
-
 	config := Config{
-		Token:   d.Get("token").(string),
-		Account: d.Get("account").(string),
+		Endpoint:       d.Get("endpoint").(string),
+		AppKey:         d.Get("application_key").(string),
+		AppSecret :     d.Get("application_secret").(string),
+		ConsumerKey:    d.Get("consumer_key").(string),
 	}
 
 	return config.Client()

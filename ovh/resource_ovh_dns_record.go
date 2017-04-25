@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-    "github.com/ovh/go-ovh/ovh"
+    //"github.com/ovh/go-ovh/ovh"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
@@ -57,18 +57,18 @@ func resourceOVHDomainZoneRecord() *schema.Resource {
 
 func resourceOVHRecordCreate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*Client)
-    
+
 	// Create the new record
     newRecord := &Record{
-		Zone:       d.Get("zone").(string),
-		FieldType:  d.Get("fieldType").(string),
-		SubDomain:  d.Get("subDomain").(string),
-        Target:     d.Get("Target").(string),
-        Ttl:        strconv.Atoi(attr.(string),
-	}
-	
+        Zone:       d.Get("zone").(string),
+        FieldType:  d.Get("fieldType").(string),
+        SubDomain:  d.Get("subDomain").(string),
+        Target:     d.Get("target").(string),
+        Ttl:        strconv.Atoi(d.Get("ttl").(string)),
+    }
+
 	log.Printf("[DEBUG] OVH Record create configuration: %#v", newRecord)
-    
+
     resultID := int;
 	resp, err := provider.client.Post(fmt.Sprintf("/domain/zone/%s/record", newRecord.Zone), newRecord, &resultID)
 	if err != nil {
@@ -132,9 +132,9 @@ func resourceOVHRecordUpdate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] OVH Record update configuration: %#v", updateRecord)
 
 	_, err = provider.client.Put(
-        fmt.Sprintf("/domain/zone/%s/record/%s", d.Get("zone").(string), recordID), 
+        fmt.Sprintf("/domain/zone/%s/record/%s", d.Get("zone").(string), recordID),
         record,
-        nil
+        nil,
     )
 	if err != nil {
 		return fmt.Errorf("Failed to update OVH Record: %s", err)
@@ -143,7 +143,7 @@ func resourceOVHRecordUpdate(d *schema.ResourceData, meta interface{}) error {
 	return resourceDNSimpleRecordRead(d, meta)
 }
 
-func resourceDNSimpleRecordDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceOVHRecordDelete(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*Client)
 
 	log.Printf("[INFO] Deleting OVH Record: %s.%s, %s", d.Get("zone").(string), d.Get("subDomain").(string), d.Id())
@@ -154,8 +154,8 @@ func resourceDNSimpleRecordDelete(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	_, err = provider.client.Delete(
-        fmt.Sprintf("/domain/zone/%s/record/%s", d.Get("zone").(string), recordID), 
-        nil
+        fmt.Sprintf("/domain/zone/%s/record/%s", d.Get("zone").(string), recordID),
+        nil,
     )
 
 	if err != nil {

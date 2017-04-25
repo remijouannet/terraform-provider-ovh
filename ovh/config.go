@@ -2,9 +2,9 @@ package ovh
 
 import (
 	"log"
-
+	"fmt"
 	"github.com/ovh/go-ovh/ovh"
-	"github.com/hashicorp/terraform/terraform"
+	//"github.com/hashicorp/terraform/terraform"
 )
 
 type Config struct {
@@ -25,15 +25,15 @@ type Client struct {
 func (c *Config) Client() (*Client, error) {
 
     client, err := ovh.NewClient(
-        c.endpoint, 
-        c.AppKey, 
-        c.AppSecret, 
-        c.consumerKey
+        c.Endpoint,
+        c.AppKey,
+        c.AppSecret,
+        c.ConsumerKey,
     )
-    
+
     if err != nil {
 		fmt.Printf("Error Client : %q\n", err)
-		return
+		return nil, nil
 	}
 
 	provider := &Client{
@@ -41,9 +41,9 @@ func (c *Config) Client() (*Client, error) {
 		config: c,
 	}
 
-    err := provider.client.Ping(); err != nil  {
+    if err := client.Ping(); err != nil {
         log.Printf("[INFO] failed ping API")
-        return
+        return nil, nil    
     } 
 
 	log.Printf("[INFO] OVH Client configured for account: %s", c.AppKey)

@@ -2,7 +2,7 @@ package ovh
 
 import (
 //	"errors"
-
+	"log"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 )
@@ -32,8 +32,8 @@ func Provider() terraform.ResourceProvider {
 			"consumer_key": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("OVH_CONSUMER_KEY", nil),
-				Description: "Consumer Key.",
+				DefaultFunc: schema.EnvDefaultFunc("OVH_APPLICATION_SECRET", nil),
+				Description: "Consumer key",
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
@@ -44,11 +44,12 @@ func Provider() terraform.ResourceProvider {
 }
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
+    log.Printf("[INFO] provider init")
 	config := Config{
 		Endpoint:       d.Get("endpoint").(string),
 		AppKey:         d.Get("application_key").(string),
 		AppSecret :     d.Get("application_secret").(string),
-		ConsumerKey:    d.Get("consumer_key").(string),
+		ConsumerKey :     d.Get("consumer_key").(string),
 	}
 
 	return config.Client()

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/remijouannet/terraform-provider-ovh/ovh"
 	"github.com/hashicorp/terraform/plugin"
+	"github.com/remijouannet/terraform-provider-ovh/ovh"
 )
 
 func main() {

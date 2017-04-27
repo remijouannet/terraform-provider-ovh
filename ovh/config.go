@@ -14,15 +14,16 @@ type Config struct {
 	ConsumerKey string
 }
 
-// Client represents the DNSimple provider client.
+// Client represents the OVH provider client.
 // This is a convenient container for the configuration and the underlying API client.
 type Client struct {
 	client *ovh.Client
 	config *Config
 }
 
-// Client() returns a new client for accessing dnsimple.
+// Client() returns a new client for accessing ovh API.
 func (c *Config) Client() (*Client, error) {
+    log.Printf("[INFO] client init")
 
     client, err := ovh.NewClient(
         c.Endpoint,
@@ -41,10 +42,10 @@ func (c *Config) Client() (*Client, error) {
 		config: c,
 	}
 
-    if err := client.Ping(); err != nil {
+    if err := provider.client.Ping(); err != nil {
         log.Printf("[INFO] failed ping API")
-        return nil, nil    
-    } 
+        return nil, nil
+    }
 
 	log.Printf("[INFO] OVH Client configured for account: %s", c.AppKey)
 

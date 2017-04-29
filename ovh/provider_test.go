@@ -14,7 +14,7 @@ var testAccProvider *schema.Provider
 func init() {
 	testAccProvider = Provider().(*schema.Provider)
 	testAccProviders = map[string]terraform.ResourceProvider{
-		"dnsimple": testAccProvider,
+		"ovh": testAccProvider,
 	}
 }
 
@@ -29,19 +29,19 @@ func TestProvider_impl(t *testing.T) {
 }
 
 func testAccPreCheck(t *testing.T) {
-	if v := os.Getenv("DNSIMPLE_EMAIL"); v != "" {
-		t.Fatal("DNSIMPLE_EMAIL is no longer required for DNSimple API v2")
+	if v := os.Getenv("OVH_APPLICATION_KEY"); v != "" {
+		t.Fatal("OVH_APPLICATION_KEY must be set for acceptance tests")
 	}
 
-	if v := os.Getenv("DNSIMPLE_TOKEN"); v == "" {
-		t.Fatal("DNSIMPLE_TOKEN must be set for acceptance tests")
+	if v := os.Getenv("OVH_APPLICATION_SECRET"); v == "" {
+		t.Fatal("OVH_APPLICATION_SECRET must be set for acceptance tests")
 	}
 
-	if v := os.Getenv("DNSIMPLE_ACCOUNT"); v == "" {
-		t.Fatal("DNSIMPLE_ACCOUNT must be set for acceptance tests")
+	if v := os.Getenv("OVH_APPLICATION_SECRET"); v == "" {
+		t.Fatal("OVH_APPLICATION_SECRET must be set for acceptance tests")
 	}
 
-	if v := os.Getenv("DNSIMPLE_DOMAIN"); v == "" {
-		t.Fatal("DNSIMPLE_DOMAIN must be set for acceptance tests. The domain is used to create and destroy record against.")
+	if v := os.Getenv("OVH_ZONE"); v == "" {
+		t.Fatal("OVH_ZONE must be set for acceptance tests. The domain is used to create and destroy record against.")
 	}
 }

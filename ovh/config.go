@@ -43,11 +43,11 @@ func (c *Config) Client() (*Client, error) {
 	}
 
     if err := provider.client.Ping(); err != nil {
-        log.Printf("[INFO] failed ping API")
+        log.Printf("[INFO] failed ping API %s", err)
         return nil, nil
     }
 
-	log.Printf("[INFO] OVH Client configured for account: %s", c.AppKey)
+	log.Printf("[INFO] OVH Client configured")
 
 	return provider, nil
 }

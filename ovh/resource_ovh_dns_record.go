@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-    //"github.com/ovh/go-ovh/ovh"
+
 	"github.com/hashicorp/terraform/helper/schema"
 )
 

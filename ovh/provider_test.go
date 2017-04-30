@@ -29,19 +29,16 @@ func TestProvider_impl(t *testing.T) {
 }
 
 func testAccPreCheck(t *testing.T) {
-	if v := os.Getenv("OVH_APPLICATION_KEY"); v != "" {
+	if v := os.Getenv("OVH_APPLICATION_KEY"); v == "" {
 		t.Fatal("OVH_APPLICATION_KEY must be set for acceptance tests")
 	}
-
 	if v := os.Getenv("OVH_APPLICATION_SECRET"); v == "" {
 		t.Fatal("OVH_APPLICATION_SECRET must be set for acceptance tests")
 	}
-
-	if v := os.Getenv("OVH_APPLICATION_SECRET"); v == "" {
-		t.Fatal("OVH_APPLICATION_SECRET must be set for acceptance tests")
+	if v := os.Getenv("OVH_CONSUMER_KEY"); v == "" {
+		t.Fatal("OVH_CONSUMER_KEY must be set for acceptance tests")
 	}
-
 	if v := os.Getenv("OVH_ZONE"); v == "" {
-		t.Fatal("OVH_ZONE must be set for acceptance tests. The domain is used to create and destroy record against.")
+		t.Fatal("OVH_ZONE must be set for acceptance tests. this zone is used to create/destroy record")
 	}
 }

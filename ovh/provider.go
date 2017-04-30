@@ -14,7 +14,7 @@ func Provider() terraform.ResourceProvider {
 			"endpoint": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("OVH_ENDPOINT", nil),
+				DefaultFunc: schema.EnvDefaultFunc("OVH_ENDPOINT", "ovh-eu"),
 				Description: "the OVH endpoint, should be ovh-eu or ovh-us",
 			},
 			"application_key": &schema.Schema{
@@ -32,7 +32,7 @@ func Provider() terraform.ResourceProvider {
 			"consumer_key": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("OVH_APPLICATION_SECRET", nil),
+				DefaultFunc: schema.EnvDefaultFunc("OVH_CONSUMER_KEY", nil),
 				Description: "Consumer key",
 			},
 		},

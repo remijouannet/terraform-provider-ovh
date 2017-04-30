@@ -1,6 +1,6 @@
 # terraform_osc
 
-#howto
+## howto
 if you want to use the OVH API you have to generate:
     * An Application Key
     * An Application Secret Key
@@ -35,7 +35,7 @@ resource "ovh_domain_zone_record" "test" {
 ```
 
 
-#MakeFile
+## MakeFile
 * build : make build
 
 * install : make install

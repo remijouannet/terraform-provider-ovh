@@ -16,7 +16,23 @@ PUT    : /domain/zone/*
 POST   : /domain/zone/*
 DELETE : /domain/zone/*
 ```
+* tf example
 
+```
+provider "ovh" {
+    application_key = "azrzqrgqvvdsfgsfffgc"
+    application_secret = "aztfqsqfsdcsdqezrfdvcx"
+    consumer_key = "aergfvdsrgtfbvcretfgd"
+}
+
+resource "ovh_domain_zone_record" "test" {
+    zone = "testdemo.ovh"
+    subDomain = "test"
+    fieldType = "A"
+    ttl = "3600"
+    target = "0.0.0.0"
+}
+```
 
 
 #MakeFile

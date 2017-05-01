@@ -1,10 +1,10 @@
 package ovh
 
 import (
-//	"errors"
-	"log"
+	//	"errors"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
+	"log"
 )
 
 // Provider returns a terraform.ResourceProvider.
@@ -44,12 +44,12 @@ func Provider() terraform.ResourceProvider {
 }
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
-    log.Printf("[INFO] provider init")
+	log.Printf("[INFO] provider init")
 	config := Config{
-		Endpoint:       d.Get("endpoint").(string),
-		AppKey:         d.Get("application_key").(string),
-		AppSecret :     d.Get("application_secret").(string),
-		ConsumerKey :     d.Get("consumer_key").(string),
+		Endpoint:    d.Get("endpoint").(string),
+		AppKey:      d.Get("application_key").(string),
+		AppSecret:   d.Get("application_secret").(string),
+		ConsumerKey: d.Get("consumer_key").(string),
 	}
 
 	return config.Client()

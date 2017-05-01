@@ -30,16 +30,16 @@ func TestAccOVHRecord_Basic(t *testing.T) {
 						"ovh_domain_zone_record.foobar", "zone", zone),
 					resource.TestCheckResourceAttr(
 						"ovh_domain_zone_record.foobar", "target", "192.168.0.10"),
-				    resource.TestCheckResourceAttr(
+					resource.TestCheckResourceAttr(
 						"ovh_domain_zone_record.foobar", "ttl", "3600"),
-                ),
+				),
 			},
 		},
 	})
 }
 
 func TestAccOVHRecord_Updated(t *testing.T) {
-    record := Record{};
+	record := Record{}
 	zone := os.Getenv("OVH_ZONE")
 
 	resource.Test(t, resource.TestCase{
@@ -50,7 +50,7 @@ func TestAccOVHRecord_Updated(t *testing.T) {
 			resource.TestStep{
 				Config: fmt.Sprintf(testAccCheckOVHRecordConfig_basic, zone),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckOVHRecordExists("ovh_domain_zone_record.foobar",  &record),
+					testAccCheckOVHRecordExists("ovh_domain_zone_record.foobar", &record),
 					testAccCheckOVHRecordAttributes(&record),
 					resource.TestCheckResourceAttr(
 						"ovh_domain_zone_record.foobar", "subDomain", "terraform"),
@@ -58,7 +58,7 @@ func TestAccOVHRecord_Updated(t *testing.T) {
 						"ovh_domain_zone_record.foobar", "zone", zone),
 					resource.TestCheckResourceAttr(
 						"ovh_domain_zone_record.foobar", "target", "192.168.0.10"),
-				    resource.TestCheckResourceAttr(
+					resource.TestCheckResourceAttr(
 						"ovh_domain_zone_record.foobar", "ttl", "3600"),
 				),
 			},
@@ -88,9 +88,9 @@ func TestAccOVHRecord_Updated(t *testing.T) {
 						"ovh_domain_zone_record.foobar", "zone", zone),
 					resource.TestCheckResourceAttr(
 						"ovh_domain_zone_record.foobar", "target", "192.168.0.11"),
-			        resource.TestCheckResourceAttr(
-                        "ovh_domain_zone_record.foobar", "ttl", "3600"),
-                ),
+					resource.TestCheckResourceAttr(
+						"ovh_domain_zone_record.foobar", "ttl", "3600"),
+				),
 			},
 			resource.TestStep{
 				Config: fmt.Sprintf(testAccCheckOVHRecordConfig_new_value_3, zone),
@@ -103,10 +103,9 @@ func TestAccOVHRecord_Updated(t *testing.T) {
 						"ovh_domain_zone_record.foobar", "zone", zone),
 					resource.TestCheckResourceAttr(
 						"ovh_domain_zone_record.foobar", "target", "192.168.0.13"),
-				    resource.TestCheckResourceAttr(
-                        "ovh_domain_zone_record.foobar", "ttl", "3604"),
-                ),
-
+					resource.TestCheckResourceAttr(
+						"ovh_domain_zone_record.foobar", "ttl", "3604"),
+				),
 			},
 		},
 	})
@@ -124,10 +123,10 @@ func testAccCheckOVHRecordDestroy(s *terraform.State) error {
 		recordID, _ := strconv.Atoi(rs.Primary.ID)
 
 		resultRecord := Record{}
-        err := provider.client.Get(
-            fmt.Sprintf("/domain/zone/%s/record/%d", zone, recordID),
-            &resultRecord,
-        )
+		err := provider.client.Get(
+			fmt.Sprintf("/domain/zone/%s/record/%d", zone, recordID),
+			&resultRecord,
+		)
 
 		if err == nil {
 			return fmt.Errorf("Record still exists")
@@ -153,16 +152,16 @@ func testAccCheckOVHRecordExists(n string, record *Record) resource.TestCheckFun
 		provider := testAccProvider.Meta().(*Client)
 
 		recordID, _ := strconv.Atoi(rs.Primary.ID)
-        err := provider.client.Get(
-            fmt.Sprintf("/domain/zone/%s/record/%d", zone, recordID),
-            record,
-        )
+		err := provider.client.Get(
+			fmt.Sprintf("/domain/zone/%s/record/%d", zone, recordID),
+			record,
+		)
 
 		if err != nil {
 			return err
 		}
 
-        if record.Id != recordID {
+		if record.Id != recordID {
 			return fmt.Errorf("Record not found")
 		}
 
@@ -214,17 +213,16 @@ func testAccCheckOVHRecordAttributesUpdated_3(record *Record) resource.TestCheck
 			return fmt.Errorf("Bad content: %#v", record)
 		}
 
-        if record.SubDomain != "terraform3" {
+		if record.SubDomain != "terraform3" {
 			return fmt.Errorf("Bad content: %#v", record)
 		}
 
-        if record.Ttl != 3604 {
+		if record.Ttl != 3604 {
 			return fmt.Errorf("Bad content: %#v", record)
 		}
 		return nil
 	}
 }
-
 
 const testAccCheckOVHRecordConfig_basic = `
 resource "ovh_domain_zone_record" "foobar" {

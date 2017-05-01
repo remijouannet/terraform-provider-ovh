@@ -1,4 +1,4 @@
-# terraform_osc
+# terraform_ovh
 
 ## howto
 if you want to use the OVH API you have to generate:

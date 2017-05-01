@@ -1,5 +1,6 @@
 build:
 	go get ./...
+	go fmt main.go
 	go fmt ovh/*
 	go build -o terraform-provider-ovh .
 deps:

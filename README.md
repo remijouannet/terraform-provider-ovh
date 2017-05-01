@@ -2,9 +2,10 @@
 
 ## howto
 if you want to use the OVH API you have to generate:
-    * An Application Key
-    * An Application Secret Key
-    * A Consumer Key
+
+* An Application Key
+* An Application Secret Key
+* A Consumer Key
 
 you can generate all three on this page 
 https://eu.api.ovh.com/createToken/
@@ -16,7 +17,7 @@ PUT    : /domain/zone/*
 POST   : /domain/zone/*
 DELETE : /domain/zone/*
 ```
-* tf example
+* ovh.tf example
 
 ```
 provider "ovh" {

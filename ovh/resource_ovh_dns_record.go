@@ -49,11 +49,11 @@ func resourceOVHDomainZoneRecord() *schema.Resource {
 				Optional: true,
 				Default:  3600,
 			},
-			"fieldType": {
+			"fieldtype": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"subDomain": {
+			"subdomain": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
@@ -66,8 +66,8 @@ func resourceOVHRecordCreate(d *schema.ResourceData, meta interface{}) error {
 
 	// Create the new record
 	newRecord := &NewRecord{
-		FieldType: d.Get("fieldType").(string),
-		SubDomain: d.Get("subDomain").(string),
+		FieldType: d.Get("fieldtype").(string),
+		SubDomain: d.Get("subdomain").(string),
 		Target:    d.Get("target").(string),
 		Ttl:       d.Get("ttl").(int),
 	}
@@ -110,8 +110,8 @@ func resourceOVHRecordRead(d *schema.ResourceData, meta interface{}) error {
 
 	d.Set("id", record.Id)
 	d.Set("zone", record.Zone)
-	d.Set("fieldType", record.FieldType)
-	d.Set("subDomain", record.SubDomain)
+	d.Set("fielddype", record.FieldType)
+	d.Set("subdomain", record.SubDomain)
 	d.Set("ttl", record.Ttl)
 	d.Set("target", record.Target)
 

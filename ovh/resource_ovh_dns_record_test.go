@@ -112,7 +112,7 @@ func TestAccOVHRecord_Updated(t *testing.T) {
 }
 
 func testAccCheckOVHRecordDestroy(s *terraform.State) error {
-	provider := testAccProvider.Meta().(*Client)
+	provider := testAccProvider.Meta().(*Config)
 	zone := os.Getenv("OVH_ZONE")
 
 	for _, rs := range s.RootModule().Resources {
@@ -120,11 +120,9 @@ func testAccCheckOVHRecordDestroy(s *terraform.State) error {
 			continue
 		}
 
-		recordID, _ := strconv.Atoi(rs.Primary.ID)
-
 		resultRecord := Record{}
-		err := provider.client.Get(
-			fmt.Sprintf("/domain/zone/%s/record/%d", zone, recordID),
+		err := provider.OVHClient.Get(
+			fmt.Sprintf("/domain/zone/%s/record/%s", zone, rs.Primary.ID),
 			&resultRecord,
 		)
 
@@ -149,11 +147,10 @@ func testAccCheckOVHRecordExists(n string, record *Record) resource.TestCheckFun
 			return fmt.Errorf("No Record ID is set")
 		}
 
-		provider := testAccProvider.Meta().(*Client)
+		provider := testAccProvider.Meta().(*Config)
 
-		recordID, _ := strconv.Atoi(rs.Primary.ID)
-		err := provider.client.Get(
-			fmt.Sprintf("/domain/zone/%s/record/%d", zone, recordID),
+		err := provider.OVHClient.Get(
+			fmt.Sprintf("/domain/zone/%s/record/%s", zone, rs.Primary.ID),
 			record,
 		)
 
@@ -161,7 +158,7 @@ func testAccCheckOVHRecordExists(n string, record *Record) resource.TestCheckFun
 			return err
 		}
 
-		if record.Id != recordID {
+		if strconv.Itoa(record.Id) != rs.Primary.ID {
 			return fmt.Errorf("Record not found")
 		}
 
@@ -230,7 +227,7 @@ resource "ovh_domain_zone_record" "foobar" {
 	subDomain = "terraform"
 	target = "192.168.0.10"
 	fieldType = "A"
-	ttl = "3600"
+	ttl = 3600
 }`
 
 const testAccCheckOVHRecordConfig_new_value_1 = `
@@ -239,7 +236,7 @@ resource "ovh_domain_zone_record" "foobar" {
 	subDomain = "terraform"
 	target = "192.168.0.11"
 	fieldType = "A"
-	ttl = "3600"
+	ttl = 3600
 }
 `
 const testAccCheckOVHRecordConfig_new_value_2 = `
@@ -248,7 +245,7 @@ resource "ovh_domain_zone_record" "foobar" {
 	subDomain = "terraform2"
 	target = "192.168.0.11"
 	fieldType = "A"
-	ttl = "3600"
+	ttl = 3600
 }
 `
 const testAccCheckOVHRecordConfig_new_value_3 = `
@@ -257,5 +254,5 @@ resource "ovh_domain_zone_record" "foobar" {
 	subDomain = "terraform3"
 	target = "192.168.0.13"
 	fieldType = "A"
-	ttl = "3604"
+	ttl = 3604
 }`

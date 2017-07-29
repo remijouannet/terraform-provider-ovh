@@ -1,56 +1,72 @@
 package ovh
 
 import (
-	//	"errors"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
-	"log"
 )
 
-// Provider returns a terraform.ResourceProvider.
+// Provider returns a schema.Provider for OVH.
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			"endpoint": &schema.Schema{
 				Type:        schema.TypeString,
-				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("OVH_ENDPOINT", "ovh-eu"),
-				Description: "the OVH endpoint, should be ovh-eu or ovh-us",
+				Required:    true,
+				DefaultFunc: schema.EnvDefaultFunc("OVH_ENDPOINT", nil),
+				Description: descriptions["endpoint"],
 			},
 			"application_key": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("OVH_APPLICATION_KEY", nil),
-				Description: "Application Key",
+				DefaultFunc: schema.EnvDefaultFunc("OVH_APPLICATION_KEY", ""),
+				Description: descriptions["application_key"],
 			},
 			"application_secret": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("OVH_APPLICATION_SECRET", nil),
-				Description: "Application secret key.",
+				DefaultFunc: schema.EnvDefaultFunc("OVH_APPLICATION_SECRET", ""),
+				Description: descriptions["application_secret"],
 			},
 			"consumer_key": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("OVH_CONSUMER_KEY", nil),
-				Description: "Consumer key",
+				DefaultFunc: schema.EnvDefaultFunc("OVH_CONSUMER_KEY", ""),
+				Description: descriptions["consumer_key"],
 			},
 		},
+
 		ResourcesMap: map[string]*schema.Resource{
 			"ovh_domain_zone_record": resourceOVHDomainZoneRecord(),
 		},
-		ConfigureFunc: providerConfigure,
+
+		ConfigureFunc: configureProvider,
 	}
 }
 
-func providerConfigure(d *schema.ResourceData) (interface{}, error) {
-	log.Printf("[INFO] provider init")
+var descriptions map[string]string
+
+func init() {
+	descriptions = map[string]string{
+		"endpoint": "The OVH API endpoint to target (ex: \"ovh-eu\").",
+
+		"application_key": "The OVH API Application Key.",
+
+		"application_secret": "The OVH API Application Secret.",
+		"consumer_key":       "The OVH API Consumer key.",
+	}
+}
+
+func configureProvider(d *schema.ResourceData) (interface{}, error) {
 	config := Config{
-		Endpoint:    d.Get("endpoint").(string),
-		AppKey:      d.Get("application_key").(string),
-		AppSecret:   d.Get("application_secret").(string),
-		ConsumerKey: d.Get("consumer_key").(string),
+		Endpoint:          d.Get("endpoint").(string),
+		ApplicationKey:    d.Get("application_key").(string),
+		ApplicationSecret: d.Get("application_secret").(string),
+		ConsumerKey:       d.Get("consumer_key").(string),
 	}
 
-	return config.Client()
+	if err := config.loadAndValidate(); err != nil {
+		return nil, err
+	}
+
+	return &config, nil
 }

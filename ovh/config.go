@@ -2,52 +2,54 @@ package ovh
 
 import (
 	"fmt"
-	"github.com/ovh/go-ovh/ovh"
 	"log"
-	//"github.com/hashicorp/terraform/terraform"
+
+	"github.com/ovh/go-ovh/ovh"
 )
 
 type Config struct {
-	Endpoint    string
-	AppKey      string
-	AppSecret   string
-	ConsumerKey string
+	Endpoint          string
+	ApplicationKey    string
+	ApplicationSecret string
+	ConsumerKey       string
+	OVHClient         *ovh.Client
 }
 
-// Client represents the OVH provider client.
-// This is a convenient container for the configuration and the underlying API client.
-type Client struct {
-	client *ovh.Client
-	config *Config
-}
-
-// Client() returns a new client for accessing ovh API.
-func (c *Config) Client() (*Client, error) {
-	log.Printf("[INFO] client init")
-
+func clientDefault(c *Config) (*ovh.Client, error) {
 	client, err := ovh.NewClient(
 		c.Endpoint,
-		c.AppKey,
-		c.AppSecret,
+		c.ApplicationKey,
+		c.ApplicationSecret,
 		c.ConsumerKey,
 	)
-
 	if err != nil {
-		fmt.Printf("Error Client : %q\n", err)
-		return nil, nil
+		return nil, err
+	}
+	return client, nil
+}
+
+func (c *Config) loadAndValidate() error {
+	validEndpoint := false
+
+	ovhEndpoints := [2]string{ovh.OvhEU, ovh.OvhCA}
+
+	for _, e := range ovhEndpoints {
+		if ovh.Endpoints[c.Endpoint] == e {
+			validEndpoint = true
+		}
 	}
 
-	provider := &Client{
-		client: client,
-		config: c,
+	if !validEndpoint {
+		return fmt.Errorf("%s must be one of %#v endpoints\n", c.Endpoint, ovh.Endpoints)
 	}
 
-	if err := provider.client.Ping(); err != nil {
-		log.Printf("[INFO] failed ping API %s", err)
-		return nil, nil
+	targetClient, err := clientDefault(c)
+	if err != nil {
+		return fmt.Errorf("Error getting ovh client: %q\n", err)
 	}
 
-	log.Printf("[INFO] OVH Client configured")
+	log.Printf("[DEBUG] Logged in on OVH API!")
+	c.OVHClient = targetClient
 
-	return provider, nil
+	return nil
 }

@@ -33,7 +33,7 @@ func resourceOVHDomainZoneRecord() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"id": {
-				Type:     schema.TypeString,
+				Type:     schema.TypeInt,
 				Computed: true,
 			},
 			"zone": {
@@ -45,9 +45,9 @@ func resourceOVHDomainZoneRecord() *schema.Resource {
 				Required: true,
 			},
 			"ttl": {
-				Type:     schema.TypeString,
+				Type:     schema.TypeInt,
 				Optional: true,
-				Default:  "3600",
+				Default:  3600,
 			},
 			"fieldType": {
 				Type:     schema.TypeString,
@@ -62,22 +62,21 @@ func resourceOVHDomainZoneRecord() *schema.Resource {
 }
 
 func resourceOVHRecordCreate(d *schema.ResourceData, meta interface{}) error {
-	provider := meta.(*Client)
+	provider := meta.(*Config)
 
 	// Create the new record
 	newRecord := &NewRecord{
 		FieldType: d.Get("fieldType").(string),
 		SubDomain: d.Get("subDomain").(string),
 		Target:    d.Get("target").(string),
+		Ttl:       d.Get("ttl").(int),
 	}
-
-	newRecord.Ttl, _ = strconv.Atoi(d.Get("ttl").(string))
 
 	log.Printf("[DEBUG] OVH Record create configuration: %#v", newRecord)
 
 	resultRecord := Record{}
 
-	err := provider.client.Post(
+	err := provider.OVHClient.Post(
 		fmt.Sprintf("/domain/zone/%s/record", d.Get("zone").(string)),
 		newRecord,
 		&resultRecord,
@@ -87,24 +86,20 @@ func resourceOVHRecordCreate(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Failed to create OVH Record: %s", err)
 	}
 
+	d.Set("id", resultRecord.Id)
 	d.SetId(strconv.Itoa(resultRecord.Id))
-	d.Set("id", strconv.Itoa(resultRecord.Id))
+
 	log.Printf("[INFO] OVH Record ID: %s", d.Id())
 
 	return resourceOVHRecordRead(d, meta)
 }
 
 func resourceOVHRecordRead(d *schema.ResourceData, meta interface{}) error {
-	provider := meta.(*Client)
-
-	recordID, err := strconv.Atoi(d.Id())
-	if err != nil {
-		return fmt.Errorf("Error converting Record ID: %s", err)
-	}
+	provider := meta.(*Config)
 
 	record := Record{}
-	err = provider.client.Get(
-		fmt.Sprintf("/domain/zone/%s/record/%d", d.Get("zone").(string), recordID),
+	err := provider.OVHClient.Get(
+		fmt.Sprintf("/domain/zone/%s/record/%s", d.Get("zone").(string), d.Id()),
 		&record,
 	)
 
@@ -117,19 +112,14 @@ func resourceOVHRecordRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("zone", record.Zone)
 	d.Set("fieldType", record.FieldType)
 	d.Set("subDomain", record.SubDomain)
-	d.Set("ttl", strconv.Itoa(record.Ttl))
+	d.Set("ttl", record.Ttl)
 	d.Set("target", record.Target)
 
 	return nil
 }
 
 func resourceOVHRecordUpdate(d *schema.ResourceData, meta interface{}) error {
-	provider := meta.(*Client)
-
-	recordID, err := strconv.Atoi(d.Id())
-	if err != nil {
-		return fmt.Errorf("Error converting Record ID: %s", err)
-	}
+	provider := meta.(*Config)
 
 	record := NewRecord{}
 
@@ -143,13 +133,13 @@ func resourceOVHRecordUpdate(d *schema.ResourceData, meta interface{}) error {
 		record.Target = attr.(string)
 	}
 	if attr, ok := d.GetOk("ttl"); ok {
-		record.Ttl, _ = strconv.Atoi(attr.(string))
+		record.Ttl, _ = attr.(int)
 	}
 
 	log.Printf("[DEBUG] OVH Record update configuration: %#v", record)
 
-	err = provider.client.Put(
-		fmt.Sprintf("/domain/zone/%s/record/%d", d.Get("zone").(string), recordID),
+	err := provider.OVHClient.Put(
+		fmt.Sprintf("/domain/zone/%s/record/%s", d.Get("zone").(string), d.Id()),
 		record,
 		nil,
 	)
@@ -161,17 +151,12 @@ func resourceOVHRecordUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOVHRecordDelete(d *schema.ResourceData, meta interface{}) error {
-	provider := meta.(*Client)
+	provider := meta.(*Config)
 
 	log.Printf("[INFO] Deleting OVH Record: %s.%s, %s", d.Get("zone").(string), d.Get("subDomain").(string), d.Id())
 
-	recordID, err := strconv.Atoi(d.Id())
-	if err != nil {
-		return fmt.Errorf("Error converting Record ID: %s", err)
-	}
-
-	err = provider.client.Delete(
-		fmt.Sprintf("/domain/zone/%s/record/%d", d.Get("zone").(string), recordID),
+	err := provider.OVHClient.Delete(
+		fmt.Sprintf("/domain/zone/%s/record/%s", d.Get("zone").(string), d.Id()),
 		nil,
 	)
 

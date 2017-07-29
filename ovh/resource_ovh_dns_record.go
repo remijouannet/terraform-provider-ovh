@@ -110,7 +110,7 @@ func resourceOVHRecordRead(d *schema.ResourceData, meta interface{}) error {
 
 	d.Set("id", record.Id)
 	d.Set("zone", record.Zone)
-	d.Set("fielddype", record.FieldType)
+	d.Set("fieldtype", record.FieldType)
 	d.Set("subdomain", record.SubDomain)
 	d.Set("ttl", record.Ttl)
 	d.Set("target", record.Target)

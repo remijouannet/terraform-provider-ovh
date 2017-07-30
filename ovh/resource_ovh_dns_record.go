@@ -123,10 +123,10 @@ func resourceOVHRecordUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	record := NewRecord{}
 
-	if attr, ok := d.GetOk("subDomain"); ok {
+	if attr, ok := d.GetOk("subdomain"); ok {
 		record.SubDomain = attr.(string)
 	}
-	if attr, ok := d.GetOk("fieldType"); ok {
+	if attr, ok := d.GetOk("fieldtype"); ok {
 		record.FieldType = attr.(string)
 	}
 	if attr, ok := d.GetOk("target"); ok {
@@ -153,7 +153,7 @@ func resourceOVHRecordUpdate(d *schema.ResourceData, meta interface{}) error {
 func resourceOVHRecordDelete(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*Config)
 
-	log.Printf("[INFO] Deleting OVH Record: %s.%s, %s", d.Get("zone").(string), d.Get("subDomain").(string), d.Id())
+	log.Printf("[INFO] Deleting OVH Record: %s.%s, %s", d.Get("zone").(string), d.Get("subdomain").(string), d.Id())
 
 	err := provider.OVHClient.Delete(
 		fmt.Sprintf("/domain/zone/%s/record/%s", d.Get("zone").(string), d.Id()),

@@ -15,15 +15,15 @@ Download the binary and put it in the same folder than terraform binary
 ```
 $ wget https://github.com/remijouannet/terraform-provider-ovh/releases/download/v0.1/terraform-provider-ovh_darwin_amd64_v0.1.zip
 $ unzip terraform-provider-ovh_darwin_amd64_v0.1.zip
-$ mv terraform-provider-ovh_darwin_amd64_v0.1/terraform-provider-ovh_v0.1 ~/bin/
-$ chmod +x ~/bin/terraform-provider-ovh_v0.1
+$ mv terraform-provider-ovh_darwin_amd64_v0.1/terraform-provider-ovh-v0.1 ~/bin/
+$ chmod +x ~/bin/terraform-provider-ovh-v0.1
 ```
 
 add the following to ~/.terraformrc
 
 ```
 providers {
-  ovh = "~/bin/terraform-provider-ovh_v0.1"
+  ovh = "~/bin/terraform-provider-ovh-v0.1"
 }
 ```
 

@@ -1,6 +1,70 @@
-# terraform_ovh
+Terraform Provider for OVh DNS (unofficial)
+==================
 
-## howto
+Requirements
+------------
+
+-   [Terraform](https://www.terraform.io/downloads.html) 0.10.2 
+-   [Go](https://golang.org/doc/install) 1.8 (to build the provider plugin)
+
+Install
+---------------------
+
+Download the binary and put it in the same folder than terraform binary
+
+```
+$ wget https://github.com/remijouannet/terraform-provider-ovh/releases/download/v0.1/terraform-provider-ovh_darwin_amd64_v0.1.zip
+$ unzip terraform-provider-ovh_darwin_amd64_v0.1.zip
+$ mv terraform-provider-ovh_darwin_amd64_v0.1/terraform-provider-ovh_v0.1 ~/bin/
+$ chmod +x ~/bin/terraform-provider-ovh_v0.1
+```
+
+add the following to ~/.terraformrc
+
+```
+providers {
+  ovh = "~/bin/terraform-provider-ovh_darwin_amd64_v0.1"
+}
+```
+
+
+Build without docker
+---------------------
+
+Clone repository to: `$GOPATH/src/github.com/remijouannet/terraform-provider-ovh`
+
+```
+$ mkdir -p $GOPATH/src/github.com/remijouannet; cd $GOPATH/src/github.com/remijouannet
+$ git clone git@github.com:remijouannet/terraform-provider-ovh
+```
+
+Enter the provider directory and build the provider
+
+```
+$ cd $GOPATH/src/github.com/remijouannet/terraform-provider-ovh
+$ make build
+```
+
+Build with docker
+---------------------
+
+build the docker image
+
+```
+$ make docker-image
+```
+
+build the binaries, you'll find all the binaries in pkg/
+
+```
+$ make docker-build
+```
+
+
+How to use
+---------------------
+
+
 if you want to use the OVH API you have to generate:
 
 * An Application Key
@@ -36,12 +100,10 @@ resource "ovh_domain_zone_record" "test" {
 ```
 
 
-## MakeFile
-* build : make build
+How to Test
+---------------------
 
-* install : make install
-
-* testing : create a script name env.sh, it will contain the following
+create a script name env.sh, it will contain the following
 
 ```
 export TF_ACC="yes"

@@ -23,7 +23,7 @@ add the following to ~/.terraformrc
 
 ```
 providers {
-  ovh = "~/bin/terraform-provider-ovh-v0.1"
+  ovh = "/home/remi/bin/terraform-provider-ovh-v0.1"
 }
 ```
 

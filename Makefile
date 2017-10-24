@@ -25,7 +25,7 @@ pkg: fmt
 	echo "==> Building..."
 	CGO_ENABLED=0 gox -os=$(XC_OS) -arch=$(XC_ARCH) \
 				-osarch=$(XC_EXCLUDE_OSARCH) \
-				-output ./pkg/terraform-provider-ovh_{{.OS}}_{{.Arch}}_$(VERSION)/terraform-provider-ovh-$(VERSION) .
+				-output ./pkg/terraform-provider-ovh_{{.OS}}_{{.Arch}}_$(VERSION)/terraform-provider-ovh_$(VERSION) .
 
 vet:
 	@echo "go vet ."

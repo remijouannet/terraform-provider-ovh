@@ -5,7 +5,7 @@ Requirements
 ------------
 
 -   [Terraform](https://www.terraform.io/downloads.html) 0.10.2 
--   [Go](https://golang.org/doc/install) 1.8 (to build the provider plugin)
+-   [Go](https://golang.org/doc/install) 1.9 (to build the provider plugin)
 
 Install
 ---------------------
@@ -15,18 +15,9 @@ Download the binary and put it in the same folder than terraform binary
 ```
 $ wget https://github.com/remijouannet/terraform-provider-ovh/releases/download/v0.1/terraform-provider-ovh_darwin_amd64_v0.1.zip
 $ unzip terraform-provider-ovh_darwin_amd64_v0.1.zip
-$ mv terraform-provider-ovh_darwin_amd64_v0.1/terraform-provider-ovh-v0.1 ~/bin/
-$ chmod +x ~/bin/terraform-provider-ovh-v0.1
+$ mkdir ~/.terraform.d/plugins/ && mv terraform-provider-ovh_darwin_amd64_v0.1/terraform-provider-ovh_v0.1 ~/.terraform.d/plugins/
+$ chmod +x ~/.terraform.d/plugins/terraform-provider-ovh_v0.1
 ```
-
-add the following to ~/.terraformrc
-
-```
-providers {
-  ovh = "/home/remi/bin/terraform-provider-ovh-v0.1"
-}
-```
-
 
 Build without docker
 ---------------------

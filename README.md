@@ -1,4 +1,4 @@
-Terraform Provider for OVh DNS (unofficial)
+Terraform Provider for OVH DNS (unofficial)
 ==================
 
 Requirements

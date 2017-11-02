@@ -76,6 +76,7 @@ DELETE : /domain/zone/*
 
 ```
 provider "ovh" {
+    endpoint = "ovh-eu"
     application_key = "azrzqrgqvvdsfgsfffgc"
     application_secret = "aztfqsqfsdcsdqezrfdvcx"
     consumer_key = "aergfvdsrgtfbvcretfgd"
@@ -83,8 +84,8 @@ provider "ovh" {
 
 resource "ovh_domain_zone_record" "test" {
     zone = "testdemo.ovh"
-    subDomain = "test"
-    fieldType = "A"
+    subdomain = "test"
+    fieldtype = "A"
     ttl = "3600"
     target = "0.0.0.0"
 }

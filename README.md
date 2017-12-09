@@ -1,6 +1,9 @@
 Terraform Provider for OVH DNS (unofficial)
 ==================
 
+# THIS PROVIDER IS NOW MERGE WITH THE OFFICIAL TERRAFORM PROVIDER FOR OVH
+
+
 Requirements
 ------------
 

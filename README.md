@@ -54,7 +54,6 @@ build the binaries, you'll find all the binaries in pkg/
 $ make docker-build
 ```
 
-
 How to use
 ---------------------
 

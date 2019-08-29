@@ -30,7 +30,7 @@ rm -f *.zip
 ls | while read binary
 do
     echo "zipping $binary"
-    7za a -bb3 -bt -slt -mmt$(nproc) -mx=9 -tzip -r $binary.zip $binary
+    zip -r $binary.zip $binary
     echo "upload $binary"
     github-release upload \
         --user remijouannet \
